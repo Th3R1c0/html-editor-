@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "@codemirror/lang-css": "^6.0.2",
-    "@codemirror/lang-javascript": "^6.1.4"
-  }
-}
