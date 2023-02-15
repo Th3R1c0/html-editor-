@@ -6,8 +6,8 @@ import { BasicSetupOptions } from '@uiw/react-codemirror';
 import {css} from '@codemirror/lang-css'
 import CodeMirror from '@uiw/react-codemirror';
 
-import { fetchUsers, increment } from "../slices/userSlice";
-import { AppDispatch, RootState } from '../store/store'
+import { fetchCode, increment } from "../slices/userSlice";
+import { AppDispatch, RootState } from '../store/store' //types
 import { useDispatch, useSelector } from 'react-redux';
 
 
@@ -76,28 +76,31 @@ const editors = [
    )})}</div> 
   const indexing = layout ? editors.filter(tab => currentTab == editors.indexOf(tab) ) : editors
 
-  const {entities, loading, value } = useSelector((state) => state.user)
+  const {entities, loading, value } = useSelector((state) => state.settings) // const select = (state) => state.settings -> useSelector(select)?
   const dispatch = useDispatch()
   const ref = useRef(false)
-  useEffect(() => {
-    if (ref.current == false) {
-      dispatch(fetchUsers())
-    }
-    return () => {
-      ref.current = true
-    }
-  }, [])
+  //useEffect(() => {
+   // if (ref.current == false) {
+   //   dispatch(fetchCode('examplelink'))
+   // }
+   // return () => {
+   //   ref.current = true
+   // }
+  //}, [])
   return (
     <div className="w-screen h-full flex">
     <div className='w-1/2 border h-full flex flex-col'>
       
       {layout ? editortabs : '' }
       <button onClick={() => ChangeLayout(!layout)}>change layout</button>
+
+
       <div>    {loading ? (
         <h1>Loading...</h1>
       ) : (
         entities?.map((user: any) => <h3 key={user.id}>{user.name}</h3>)
       )}</div>
+
       
     {indexing.map((editor, index) => {
       return (

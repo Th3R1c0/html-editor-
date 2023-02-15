@@ -10,7 +10,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Todo {
-  id   Int    @id @default(autoincrement())
-  todo String
+model New {
+  link String  @id @unique @default(cuid())
+  name String?
 }

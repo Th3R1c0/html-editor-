@@ -16,8 +16,9 @@ export default function RootLayout({
       */}
       <head />
       <body className='w-screen h-screen flex flex-col'>
+      <Providers>
         <Header />
-        <Providers>{children}</Providers>
+        {children}</Providers>
       </body>
     </html>
   )

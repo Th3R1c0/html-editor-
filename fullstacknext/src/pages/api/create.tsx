@@ -3,16 +3,21 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import {db} from '../../../lib/db'
 
 export default async function handler(req, res) {
+    const data = req.body;
     if (req.method === "POST") {
-        const data = req.body;
         console.log('before create')
         await db.New.create({
             data: {
-                name: 'example'
-            }
+                name: 'exampleeee'
+            }, 
         });
       }
-    console.log('came here')
-    res.status(200).json({message: 'succes'})
+      const LINK = await db.new.findFirst({
+        where: {
+            name: data
+        }
+    })
+    console.log(LINK)
+    res.status(200).json({link: LINK})
     
   }
