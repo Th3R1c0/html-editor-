@@ -6,7 +6,7 @@ import { BasicSetupOptions } from '@uiw/react-codemirror';
 import {css} from '@codemirror/lang-css'
 import CodeMirror from '@uiw/react-codemirror';
 
-import { fetchCode, increment } from "../slices/userSlice";
+import { fetchCode, updateLocalCode, share } from "../slices/userSlice";
 import { AppDispatch, RootState } from '../store/store' //types
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -33,9 +33,39 @@ const setup: BasicSetupOptions = {
 
 
 
-export default function Editor(){
+export default function Editor({params}){
+  const dispatch = useDispatch()
+  const local = useSelector((state) => state.settings.localCode)
+  const isSharing = useSelector((state) => state.settings.isSharing)
   const HtmlEditor = useRef();
-  const [html, setHtml] = useState<string>('<h1> hello world </h1>')
+  const localcode = useSelector((state) => state.settings.localCode)
+  const {loading, response} = useSelector((state) => state.settings.promiseStates.fetchCode)
+  useEffect(() => {
+    //if(isSharing == true) {
+    //  dispatch(fetchCode(localcode))
+    //  console.log('fetchCode reducer called with ', localcode)
+    //}
+    dispatch(share({type: 'enable'}))
+
+    if (params) {
+      console.log(isSharing)
+      dispatch(fetchCode(params.id))
+    }
+  }, [])
+
+  const [html, setHtml] = useState<string>('<h1> hello world </h1>') 
+  useEffect(() => {
+    dispatch(updateLocalCode({code: html, type: 'update' }))
+    console.log(html)
+    
+  }, [html])
+
+  const handleOnChange = (type, code) => {
+    //implemetn typescript example of redux dispatcher
+    //check if html js of css
+    //update redux storea
+  }
+
   const [style, setStyle] = useState<string>('.body { background-color: red}')
   const [javascript, setJavascript] = useState("console.log('hello wrold')")
   const srcdoclayout = `
@@ -76,8 +106,8 @@ const editors = [
    )})}</div> 
   const indexing = layout ? editors.filter(tab => currentTab == editors.indexOf(tab) ) : editors
 
-  const {entities, loading, value } = useSelector((state) => state.settings) // const select = (state) => state.settings -> useSelector(select)?
-  const dispatch = useDispatch()
+  
+  
   const ref = useRef(false)
   //useEffect(() => {
    // if (ref.current == false) {
@@ -95,11 +125,7 @@ const editors = [
       <button onClick={() => ChangeLayout(!layout)}>change layout</button>
 
 
-      <div>    {loading ? (
-        <h1>Loading...</h1>
-      ) : (
-        entities?.map((user: any) => <h3 key={user.id}>{user.name}</h3>)
-      )}</div>
+    {params ? loading ? <div>loading</div> : <div>{response.message}</div> : <div>no params dected</div>}
 
       
     {indexing.map((editor, index) => {

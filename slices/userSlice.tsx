@@ -9,7 +9,7 @@ export const fetchCode = createAsyncThunk(
     //);
     
     const response  = await fetch(`api/${link}`, {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
         },
@@ -39,8 +39,8 @@ export const createSharableLink = createAsyncThunk(
 const initialState = {
   promiseStates: {
     fetchCode: {
-        loading: false, 
-        response: []
+        loading: true, 
+        response: false,
         //error state?
     },
     createSharableLink: {
@@ -49,21 +49,38 @@ const initialState = {
     }
   },
   value: 10,
+  localCode: '',
+  isSharing: 'sharesafdfsfs', //{html, js, cs}
+  link: ''
 } as any;
 
 const settingsSlice = createSlice({
   name: "settings",
   initialState,
   reducers: {
-    increment: (state) => {
-      state.value++;
+    updateLocalCode: (state, action) => {
+      if (action.type =='delete') {
+        state.localCode = ''
+      } else if (action.type == 'update'){
+        console.log(action.payload)
+        state.localCode = action.payload;
+      }
+      
     },
+    share: (state, action) => {
+      if (action.type == 'settings/share' ){
+        state.link = 'fuck'
+        console.log(`share payload is ${action.payload.payload}` )
+      }
+      
+      
+    }
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCode.fulfilled, (state, action) => {
       state.promiseStates.fetchCode.loading = false;
-      console.log(action.payload)
-      //state.promiseStates.fetchCode.response = action.payload//push response from nextjs routes into state[]
+      console.log('fetch code builder.fulfilled called with payload of: ',action.payload)
+      state.promiseStates.fetchCode.response = {message: 'done'}//push response from nextjs routes into state[]
     });
 
     builder.addCase(fetchCode.pending, (state, action) => {
@@ -86,6 +103,6 @@ const settingsSlice = createSlice({
   }
 });
 
-export const { increment } = settingsSlice.actions;
+export const { updateLocalCode, share } = settingsSlice.actions;
 
 export default settingsSlice.reducer;
