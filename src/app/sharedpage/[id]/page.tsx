@@ -12,6 +12,7 @@ export default function Page({params}) {
         console.log(a)
     }, [])
     
+    
     return (
         <Editor params={params}/>
     )
