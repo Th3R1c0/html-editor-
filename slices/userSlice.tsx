@@ -36,6 +36,7 @@ export const createSharableLink = createAsyncThunk(
     }
 )
 
+
 const initialState = {
   promiseStates: {
     fetchCode: {
@@ -49,9 +50,12 @@ const initialState = {
     }
   },
   value: 10,
-  localCode: '',
-  isSharing: 'sharesafdfsfs', //{html, js, cs}
-  link: ''
+  localCode: {
+    html: '',
+    css: '', 
+    js: '',
+  },
+  isSharing: false, //{html, js, cs}
 } as any;
 
 const settingsSlice = createSlice({
@@ -59,22 +63,17 @@ const settingsSlice = createSlice({
   initialState,
   reducers: {
     updateLocalCode: (state, action) => {
-      if (action.type =='delete') {
-        state.localCode = ''
-      } else if (action.type == 'update'){
-        console.log(action.payload)
-        state.localCode = action.payload;
+      //console.log('THE PAYLOAD BES',action.payload.type)
+      if (action.payload.type == 'html') {
+        state.localCode.html = action.payload.payload
       }
+      console.log('LOCALCODDE IS', state.localCode.html)
       
     },
     share: (state, action) => {
-      if (action.type == 'settings/share' ){
-        state.link = 'fuck'
-        console.log(`share payload is ${action.payload.payload}` )
-      }
-      
-      
-    }
+      state.isSharing = action.payload
+      console.log('FROM SHARING, ACTION.PAYLOD IS', state.isSharing)
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchCode.fulfilled, (state, action) => {
