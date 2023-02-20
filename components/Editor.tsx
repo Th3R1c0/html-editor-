@@ -38,27 +38,46 @@ export default function Editor({params}){
   const local = useSelector((state) => state.settings.localCode)
   const isSharing = useSelector((state) => state.settings.isSharing)
   const HtmlEditor = useRef();
-  const localcode = useSelector((state) => state.settings.localCode)
+  const localcode = useSelector((state) => state.settings.localCode.html)
   const {loading, response} = useSelector((state) => state.settings.promiseStates.fetchCode)
   useEffect(() => {
     //if(isSharing == true) {
     //  dispatch(fetchCode(localcode))
     //  console.log('fetchCode reducer called with ', localcode)
     //}
-    dispatch(share({type: 'enable'}))
+    console.log('useEffect called here')
+    //dispatch(share({type: 'enable'}))
+    function dis(){
+      return dispatch(share({payload: 'id goes here'}))
+    }
 
     if (params) {
-      console.log(isSharing)
-      dispatch(fetchCode(params.id))
+      console.log('params detected which are ', params)
+      dis()
+      console.log('ISSHARING STATE?', isSharing)
+      //dispatch(fetchCode(params.id))
+    } else {
+      console.log('no params')
     }
   }, [])
 
-  const [html, setHtml] = useState<string>('<h1> hello world </h1>') 
   useEffect(() => {
-    dispatch(updateLocalCode({code: html, type: 'update' }))
-    console.log(html)
+    console.log('USEEFFECT SAYS IS SHARING STATE?', isSharing)
+  }, [isSharing])
+
+  const [html, setHtml] = useState<string>(`<h1 id='header'> hello world </h1>`) 
+  const updatelocalcode = (type: string) => {
+    //hardcoded payload to html for testing purposes
+    return dispatch(updateLocalCode({payload: html, type: type }))
+  }
+  useEffect(() => {
+    updatelocalcode('html')
+    
     
   }, [html])
+  useEffect(() => {
+    console.log('LOCALCODE CHANGED: BIG L', localcode)
+  }, [localcode])
 
   const handleOnChange = (type, code) => {
     //implemetn typescript example of redux dispatcher
@@ -66,14 +85,21 @@ export default function Editor({params}){
     //update redux storea
   }
 
-  const [style, setStyle] = useState<string>('.body { background-color: red}')
-  const [javascript, setJavascript] = useState("console.log('hello wrold')")
+  const [style, setStyle] = useState<string>(`body {
+    background-color: orange;
+  }`)
+  const [javascript, setJavascript] = useState(`document.getElementById("header").style.color =" blue";`)
   const srcdoclayout = `
 <!DOCTYPE html>
 <html lang="en">
-<head><link rel="stylesheet" href="${style}"></head>
-  <body>
+<head>
+<style>
+${style}
+</style>
+</head>
+  <body id='body'>
   ${html}
+  <script>${javascript}</script>
   </body>
 </html>
 `
@@ -126,7 +152,7 @@ const editors = [
 
 
     {params ? loading ? <div>loading</div> : <div>{response.message}</div> : <div>no params dected</div>}
-
+    <div> currently sharing? {isSharing ? <p>sharing</p> : <p> not currently sharing</p>}</div>
       
     {indexing.map((editor, index) => {
       return (
@@ -135,7 +161,7 @@ const editors = [
           <CodeMirror
           value={editor.value}
           extensions={editor.extensions}
-          onChange={(e) => setHtml(e)}
+          onChange={(e) => editor.onChange(e)}
           basicSetup={{
             lineNumbers: false,
             foldGutter: false,

@@ -4,16 +4,17 @@ import React, {useEffect, useState, useRef} from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import { createSharableLink, fetchCode } from "../slices/userSlice";
 import { useRouter } from 'next/navigation';
+import uuid from 'react-uuid';
 
 const Header = () => {
   const localcode = useSelector((state) => state.settings.localCode)
   const isSharing = useSelector((state) => state.settings.isSharing)
   const loadingORresponse = useSelector((state) => state.settings.promiseStates.fetchCode) //loadingORresponse.loading or .response
-  const link = useSelector((state) => state.settings.link)
-  const { promiseStates:{createSharableLink: {response}}} = useSelector((state) => state.settings)
+  const linkk = useSelector((state) => state.settings.link)
+  //const { promiseStates:{createSharableLink: {response}}} = useSelector((state) => state.settings)
   useEffect(() => {
-    console.log(`link: ${link}`)
-  }, [])
+    console.log(`link is: ${linkk}`)
+  }, [linkk])
 
   const router = useRouter()
   //share url params to figure out if they accessing via shared link or not 
@@ -21,7 +22,7 @@ const Header = () => {
   const [sharedrouteurl, setSharedrouteurl] = useState()
   const handleShare = async () => {
     const d = async() => {
-      const promise = await dispatch(createSharableLink('examplddelink'))
+      const promise = await dispatch(createSharableLink(projectname))
       return promise
     }
     d().then((res) => router.push(`/sharedpage/${res.payload.link.link}`))//router.push(`/sharedpage/${res.type}`))
@@ -32,16 +33,36 @@ const Header = () => {
   const handleCopy = () => {
     console.log('copied to clipboard')
   }
+
+
+  const [sharestate, setSharestate] = useState(false)
+  useEffect(() => {
+    setSharestate(isSharing)
+    console.log('ISSHARING FROM HEADER?', isSharing)
+  },[isSharing])
+
+  const [projectname, setProjectname] = useState('')
+  const nameComponent = () => {
+    return (
+      <div className='bg-red-200 w-max h-max'>
+        <input type='text' className='focus:outline-0' value={projectname} onChange={(e) => setProjectname(e.target.value)} />
+      </div>
+    )
+  }
+  useEffect(() => {
+    setProjectname(`project-${uuid().slice(0,8)}`)
+  },[])
   return (
     <div className="w-screen h-max p-8 items-center flex justify-between">
 
     <div className='flex space-x-8'>
       <h1 className='text-4xl'>ONLINE HTML EDITOR</h1>
-      <button onClick={response === false ? handleShare : handleCopy} type="button" className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-lg px-5 py-1.5 text-center">
-        { response === false ? 'Share' : 'Copy Link'}
+      <button onClick={sharestate ? handleCopy : handleShare } type="button" className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-lg px-5 py-1.5 text-center">
+        {/*{ response === false ? 'Share' : 'Copy Link'}*/}
+        {sharestate ? 'copy link' : 'share'}
       </button>
       <div className='hidden md:inline self-center'>
-        {response ? <p className=' border-b-2 border-black'>{response.link.link}</p>: 'share link'}
+        {sharestate ? <p className=' border-b-2 border-black'>{sharestate.payload.id}</p>: nameComponent()}
       </div>
     </div>
 
